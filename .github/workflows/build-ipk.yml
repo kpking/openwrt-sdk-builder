@@ -49,13 +49,12 @@ jobs:
       - name: Prepare feeds
         run: |
           cd sdk
-          # 覆盖默认 feeds
-          cat <<EOF > feeds.conf.default
-src-git packages https://github.com/immortalwrt/packages.git
-src-git luci https://github.com/coolsnowwolf/luci.git
-src-git routing https://github.com/openwrt/routing.git
-src-git telephony https://github.com/openwrt/telephony.git
-EOF
+          # 直接覆盖 feeds.conf.default，避免 YAML heredoc 问题
+          echo "src-git packages https://github.com/immortalwrt/packages.git" > feeds.conf.default
+          echo "src-git luci https://github.com/coolsnowwolf/luci.git" >> feeds.conf.default
+          echo "src-git routing https://github.com/openwrt/routing.git" >> feeds.conf.default
+          echo "src-git telephony https://github.com/openwrt/telephony.git" >> feeds.conf.default
+          
           ./scripts/feeds update -a
           ./scripts/feeds install -a
 
