@@ -4,9 +4,9 @@ on:
   workflow_dispatch:
     inputs:
       package:
-        description: "要编译的包名（例如 qbittorrent-nox 或 aria2）"
+        description: "要编译的包名（例如 qbittorrent 或 aria2）"
         required: true
-        default: "qbittorrent-nox"
+        default: "qbittorrent"
       target:
         description: "OpenWrt target (默认 JDCloud RE-SP-01B: ramips/mt7621)"
         required: false
@@ -34,27 +34,13 @@ jobs:
           BASE_URL="https://downloads.openwrt.org/releases/$VERSION/targets"
           SDK_URL="$BASE_URL/$TARGET/openwrt-sdk-$VERSION-${TARGET//\//-}_gcc-12.3.0_musl.Linux-x86_64.tar.xz"
 
-          # 下载 SDK
           wget $SDK_URL
-          
-          # 解压
           tar -Jxf openwrt-sdk-*.tar.xz
-          
-          # 创建 sdk 目录
-          mkdir -p sdk
-          
-          # 移动解压后的内容到 sdk 目录
-          mv openwrt-sdk-*/* sdk/
+          mv openwrt-sdk-* sdk
 
       - name: Prepare feeds
         run: |
           cd sdk
-          # 直接覆盖 feeds.conf.default，避免 YAML heredoc 问题
-          echo "src-git packages https://github.com/immortalwrt/packages.git" > feeds.conf.default
-          echo "src-git luci https://github.com/coolsnowwolf/luci.git" >> feeds.conf.default
-          echo "src-git routing https://github.com/openwrt/routing.git" >> feeds.conf.default
-          echo "src-git telephony https://github.com/openwrt/telephony.git" >> feeds.conf.default
-          
           ./scripts/feeds update -a
           ./scripts/feeds install -a
 
