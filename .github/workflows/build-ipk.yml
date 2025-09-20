@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Checkout Repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Install Dependencies
         run: |
@@ -27,7 +27,6 @@ jobs:
         run: |
           cd sdk/package
           git clone https://github.com/openwrt/packages.git openwrt-packages
-          # 把 qbittorrent 目录拷过来
           mv openwrt-packages/net/qbittorrent .
           rm -rf openwrt-packages
 
@@ -44,7 +43,7 @@ jobs:
           make package/qbittorrent/compile V=s
 
       - name: Upload IPK
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: qbittorrent-ipk
           path: sdk/bin/packages/*/base/qbittorrent*.ipk
