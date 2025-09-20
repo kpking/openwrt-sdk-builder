@@ -34,7 +34,7 @@ jobs:
       - name: Download qBittorrent source
         run: |
           cd sdk/package
-          wget https://github.com/KryptonLee/qBittorrent-openwrt-package/releases/download/qBittorrent-v4.4.5-for-openwrt-19.07/qbittorrent.tar.gz
+          wget https://github.com/KryptonLee/qBittorrent-openwrt-package/archive/refs/tags/v4.4.5-openwrt-19.07.tar.gz
           tar -xzf qbittorrent.tar.gz
           mv qbittorrent ./qbittorrent
           rm -f qbittorrent.tar.gz
