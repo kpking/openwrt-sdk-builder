@@ -13,9 +13,9 @@ jobs:
 
     - name: Download OpenWrt SDK
       run: |
-        wget https://downloads.immortalwrt.org/releases/24.10.2/targets/ramips/mt7621/immortalwrt-sdk-24.10.2-ramips-mt7621_gcc-12.3.0_musl.Linux-x86_64.tar.xz
-        tar -xf immortalwrt-sdk-24.10.2-ramips-mt7621_gcc-12.3.0_musl.Linux-x86_64.tar.xz
-        mv immortalwrt-sdk-24.10.2-ramips-mt7621_gcc-12.3.0_musl.Linux-x86_64 sdk
+        wget https://downloads.openwrt.org/releases/19.07.9/targets/ramips/mt7621/openwrt-sdk-19.07.9-ramips-mt7621_gcc-7.5.0_musl.Linux-x86_64.tar.xz
+        tar -xf openwrt-sdk-19.07.9-ramips-mt7621_gcc-7.5.0_musl.Linux-x86_64.tar.xz
+        mv openwrt-sdk-19.07.9-ramips-mt7621_gcc-7.5.0_musl.Linux-x86_64 sdk
         cd sdk && ./scripts/feeds update -a && ./scripts/feeds install -a
 
     - name: Clone qBittorrent package
