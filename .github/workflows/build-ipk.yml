@@ -21,7 +21,7 @@ jobs:
       run: |
         export OWRT_VER="19.07.9"
         export ARCH="ramips/mt7621"
-        export SDK_URL="https://downloads.openwrt.org/releases/${OWRT_VER}/targets/${ARCH}/openwrt-sdk-${OWRT_VER}-${ARCH}_gcc-7.5.0_musl.Linux-x86_64.tar.xz"
+        export SDK_URL="https://downloads.openwrt.org/releases/19.07.9/targets/ramips/mt7621/openwrt-sdk-19.07.9-ramips-mt7621_gcc-7.5.0_musl.Linux-x86_64.tar.xz"
        
         wget $SDK_URL
         tar -Jxf openwrt-sdk-*.tar.xz
