@@ -17,9 +17,9 @@ jobs:
         sudo apt-get install -y build-essential git wget curl unzip \
           libncurses5-dev gawk gettext libssl-dev xsltproc zip
 
-    - name: Download OpenWrt 19.07.10 SDK (ramips/mt7621)
+    - name: Download OpenWrt 19.07.9 SDK (ramips/mt7621)
       run: |
-        export OWRT_VER="19.07.09"
+        export OWRT_VER="19.07.9"
         export ARCH="ramips/mt7621"
         export SDK_URL="https://downloads.openwrt.org/releases/${OWRT_VER}/targets/${ARCH}/openwrt-sdk-${OWRT_VER}-${ARCH}_gcc-7.5.0_musl.Linux-x86_64.tar.xz"
        
