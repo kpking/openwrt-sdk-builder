@@ -1,4 +1,4 @@
-name: Build qBittorrent-nox for JDCloud RE-SP-01B (ramips/mt7621)
+name: Build qBittorrent IPK
 
 on:
   workflow_dispatch:
@@ -11,50 +11,27 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v4
 
-    - name: Install dependencies
+    - name: Download OpenWrt SDK
       run: |
-        sudo apt-get update
-        sudo apt-get install -y build-essential git wget curl unzip \
-          libncurses5-dev gawk gettext libssl-dev xsltproc zip python2
+        wget https://downloads.immortalwrt.org/releases/24.10.2/targets/xiaomi/nand-gw/sdk-immortalwrt-24.10.2-mt7621-generic_gcc-12.3.0_musl.Linux-x86_64.tar.xz
+        tar -xf sdk-immortalwrt-24.10.2-mt7621-generic_gcc-12.3.0_musl.Linux-x86_64.tar.xz
+        mv sdk-immortalwrt-24.10.2-mt7621-generic_gcc-12.3.0_musl.Linux-x86_64 sdk
+        cd sdk && ./scripts/feeds update -a && ./scripts/feeds install -a
 
-    - name: Download OpenWrt 19.07.9 SDK (ramips/mt7621)
-      run: |
-        export SDK_URL="https://downloads.openwrt.org/releases/19.07.9/targets/ramips/mt7621/openwrt-sdk-19.07.9-ramips-mt7621_gcc-7.5.0_musl.Linux-x86_64.tar.xz"
-        wget $SDK_URL
-        tar -Jxf openwrt-sdk-*.tar.xz
-        rm -rf sdk   # 确保旧的 sdk 不存在
-        mv openwrt-sdk-19.07.9-ramips-mt7621_gcc-7.5.0_musl.Linux-x86_64 sdk
-
-    - name: Clone qBittorrent package (for-openwrt-19.07)
+    - name: Clone qBittorrent package
       run: |
         cd sdk/package
         git clone -b for-openwrt-19.07 https://github.com/KryptonLee/qBittorrent-openwrt-package.git qbittorrent
+        ls -l qbittorrent
 
-    - name: Update feeds
-      run: |
-        cd sdk
-        ./scripts/feeds update -a
-        ./scripts/feeds install -a
-
-    - name: Configure
+    - name: Build qBittorrent
       run: |
         cd sdk
         make defconfig
-        echo "CONFIG_PACKAGE_boost=y" >> .config
-        echo "CONFIG_PACKAGE_boost-system=y" >> .config
-        echo "CONFIG_PACKAGE_qbittorrent-nox=y" >> .config
-        make defconfig
+        make package/qbittorrent/compile -j$(nproc) V=sc
 
-    - name: Build qBittorrent-nox + deps
-      run: |
-        cd sdk
-        make package/boost/compile V=s -j$(nproc) || true
-        make package/rblibtorrent/compile V=s -j$(nproc) || true
-        make package/qbittorrent/compile V=s -j$(nproc)
-
-    - name: Upload IPKs
-      uses: actions/upload-artifact@v4
+    - name: Upload IPK
+      uses: actions/upload-artifact@v3
       with:
-        name: qbittorrent-nox-with-deps
-        path: |
-          sdk/bin/packages/**/*.ipk
+        name: qbittorrent-ipk
+        path: sdk/bin/packages/*/base/*.ipk
