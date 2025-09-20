@@ -13,9 +13,9 @@ jobs:
 
     - name: Download OpenWrt SDK
       run: |
-        wget https://downloads.immortalwrt.org/releases/24.10.2/targets/xiaomi/nand-gw/sdk-immortalwrt-24.10.2-mt7621-generic_gcc-12.3.0_musl.Linux-x86_64.tar.xz
-        tar -xf sdk-immortalwrt-24.10.2-mt7621-generic_gcc-12.3.0_musl.Linux-x86_64.tar.xz
-        mv sdk-immortalwrt-24.10.2-mt7621-generic_gcc-12.3.0_musl.Linux-x86_64 sdk
+        wget https://downloads.immortalwrt.org/releases/24.10.2/targets/ramips/mt7621/immortalwrt-sdk-24.10.2-ramips-mt7621_gcc-12.3.0_musl.Linux-x86_64.tar.xz
+        tar -xf immortalwrt-sdk-24.10.2-ramips-mt7621_gcc-12.3.0_musl.Linux-x86_64.tar.xz
+        mv immortalwrt-sdk-24.10.2-ramips-mt7621_gcc-12.3.0_musl.Linux-x86_64 sdk
         cd sdk && ./scripts/feeds update -a && ./scripts/feeds install -a
 
     - name: Clone qBittorrent package
@@ -31,7 +31,7 @@ jobs:
         make package/qbittorrent/compile -j$(nproc) V=sc
 
     - name: Upload IPK
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: qbittorrent-ipk
-        path: sdk/bin/packages/*/base/*.ipk
+        path: sdk/bin/packages/*/*/*.ipk
