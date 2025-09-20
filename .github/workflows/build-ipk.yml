@@ -23,11 +23,13 @@ jobs:
           tar -xJf openwrt-sdk-23.05.3-ramips-mt7621_gcc-12.3.0_musl.Linux-x86_64.tar.xz
           mv openwrt-sdk-23.05.3-ramips-mt7621_gcc-12.3.0_musl.Linux-x86_64 sdk
 
-      - name: Get qBittorrent package
+      - name: Clone qBittorrent package
         run: |
-          cd sdk/package
-          git clone https://github.com/KryptonLee/qBittorrent-openwrt-package.git
-          mv qBittorrent-openwrt-package/net/qbittorrent .
+         cd sdk/package
+         git clone https://github.com/c0re100/qBittorrent-openwrt-package.git
+         mv qBittorrent-openwrt-package/qbittorrent ./qbittorrent
+         rm -rf qBittorrent-openwrt-package
+
 
       - name: Update feeds
         run: |
