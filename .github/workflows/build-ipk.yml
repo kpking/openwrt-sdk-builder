@@ -25,7 +25,8 @@ jobs:
        
         wget $SDK_URL
         tar -Jxf openwrt-sdk-*.tar.xz
-        mv openwrt-sdk-* sdk
+        rm -rf sdk 
+        mv openwrt-sdk-19.07.9-ramips-mt7621_gcc-7.5.0_musl.Linux-x86_64 sdk
 
     - name: Clone qBittorrent package (for-openwrt-19.7)
       run: |
