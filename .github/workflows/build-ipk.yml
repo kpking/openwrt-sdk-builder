@@ -36,7 +36,10 @@ jobs:
 
           wget $SDK_URL
           tar -Jxf openwrt-sdk-*.tar.xz
-          mv openwrt-sdk-* sdk
+
+          rm -rf sdk
+          mkdir sdk
+          mv openwrt-sdk-*/. sdk/
 
       - name: Prepare feeds
         run: |
