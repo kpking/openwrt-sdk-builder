@@ -1,4 +1,4 @@
-name: Build OpenWrt qBittorrent IPK
+name: Build qBittorrent IPK
 
 on:
   workflow_dispatch:
@@ -7,10 +7,10 @@ jobs:
   build:
     runs-on: ubuntu-22.04
     steps:
-      - name: Checkout Repo
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Install Dependencies
+      - name: Install dependencies
         run: |
           sudo apt-get update
           sudo apt-get install -y build-essential clang flex bison g++ gawk \
@@ -23,27 +23,32 @@ jobs:
           tar -xJf openwrt-sdk-23.05.3-ramips-mt7621_gcc-12.3.0_musl.Linux-x86_64.tar.xz
           mv openwrt-sdk-23.05.3-ramips-mt7621_gcc-12.3.0_musl.Linux-x86_64 sdk
 
-      - name: Add qBittorrent Package
+      - name: Get qBittorrent package
         run: |
           cd sdk/package
-          git clone https://github.com/openwrt/packages.git openwrt-packages
-          mv openwrt-packages/net/qbittorrent .
-          rm -rf openwrt-packages
+          git clone https://github.com/KryptonLee/qBittorrent-openwrt-package.git
+          mv qBittorrent-openwrt-package/net/qbittorrent .
 
-      - name: Update Feeds
+      - name: Update feeds
         run: |
           cd sdk
+          echo "src-git packages https://git.openwrt.org/feed/packages.git;openwrt-23.05" >> feeds.conf.default
+          echo "src-git luci https://git.openwrt.org/project/luci.git;openwrt-23.05" >> feeds.conf.default
           ./scripts/feeds update -a
           ./scripts/feeds install -a
+
+      - name: Configure SDK
+        run: |
+          cd sdk
           make defconfig
 
       - name: Build qBittorrent
         run: |
           cd sdk
-          make package/qbittorrent/compile V=s
+          make package/qbittorrent/compile -j$(nproc)
 
-      - name: Upload IPK
+      - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
           name: qbittorrent-ipk
-          path: sdk/bin/packages/*/base/qbittorrent*.ipk
+          path: sdk/bin/packages/*/*/qbittorrent*.ipk
