@@ -1,0 +1,59 @@
+name: Build qBittorrent-nox for JDCloud RE-SP-01B (ramips/mt7621)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y build-essential git wget curl unzip \
+          libncurses5-dev gawk gettext libssl-dev xsltproc zip python2
+
+    - name: Download OpenWrt 19.07.9 SDK (ramips/mt7621)
+      run: |
+        export SDK_URL="https://downloads.openwrt.org/releases/19.07.9/targets/ramips/mt7621/openwrt-sdk-19.07.9-ramips-mt7621_gcc-7.5.0_musl.Linux-x86_64.tar.xz"
+        wget $SDK_URL
+        tar -Jxf openwrt-sdk-*.tar.xz
+        mv openwrt-sdk-* sdk
+
+    - name: Clone qBittorrent package (for-openwrt-19.07)
+      run: |
+        cd sdk/package
+        git clone -b for-openwrt-19.07 https://github.com/KryptonLee/qBittorrent-openwrt-package.git qbittorrent
+
+    - name: Update feeds
+      run: |
+        cd sdk
+        ./scripts/feeds update -a
+        ./scripts/feeds install -a
+
+    - name: Configure
+      run: |
+        cd sdk
+        make defconfig
+        echo "CONFIG_PACKAGE_boost=y" >> .config
+        echo "CONFIG_PACKAGE_boost-system=y" >> .config
+        echo "CONFIG_PACKAGE_qbittorrent-nox=y" >> .config
+        make defconfig
+
+    - name: Build qBittorrent-nox + deps
+      run: |
+        cd sdk
+        make package/boost/compile V=s -j$(nproc) || true
+        make package/rblibtorrent/compile V=s -j$(nproc) || true
+        make package/qbittorrent/compile V=s -j$(nproc)
+
+    - name: Upload IPKs
+      uses: actions/upload-artifact@v4
+      with:
+        name: qbittorrent-nox-with-deps
+        path: |
+          sdk/bin/packages/**/*.ipk
