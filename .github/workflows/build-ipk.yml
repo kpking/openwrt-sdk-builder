@@ -1,4 +1,4 @@
-name: Build qBittorrent IPK
+name: Build qBittorrent IPK with libtorrent + Qt5
 
 on:
   workflow_dispatch:
@@ -7,7 +7,7 @@ jobs:
   build:
     runs-on: ubuntu-22.04
     steps:
-      - name: Checkout repository
+      - name: Checkout workflow repo
         uses: actions/checkout@v4
 
       - name: Install dependencies
@@ -15,7 +15,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y build-essential clang flex bison g++ gawk \
             gcc-multilib g++-multilib gettext git libncurses5-dev libssl-dev \
-            python3-distutils rsync unzip zlib1g-dev file wget
+            python3-distutils rsync unzip zlib1g-dev file wget qt5-default qtbase5-dev qttools5-dev-tools
 
       - name: Download OpenWrt SDK
         run: |
@@ -23,13 +23,29 @@ jobs:
           tar -xJf openwrt-sdk-23.05.3-ramips-mt7621_gcc-12.3.0_musl.Linux-x86_64.tar.xz
           mv openwrt-sdk-23.05.3-ramips-mt7621_gcc-12.3.0_musl.Linux-x86_64 sdk
 
-      - name: Clone qBittorrent package
+      - name: Download libtorrent-rasterbar source
         run: |
-         cd sdk/package
-         git clone https://github.com/c0re100/qBittorrent-openwrt-package.git
-         mv qBittorrent-openwrt-package/qbittorrent ./qbittorrent
-         rm -rf qBittorrent-openwrt-package
+          cd sdk/package
+          wget https://github.com/KryptonLee/qBittorrent-openwrt-package/releases/download/qBittorrent-v4.4.5-for-openwrt-19.07/libtorrent-rasterbar.tar.gz
+          tar -xzf libtorrent-rasterbar.tar.gz
+          mv libtorrent-rasterbar ./libtorrent-rasterbar
+          rm -f libtorrent-rasterbar.tar.gz
 
+      - name: Download qBittorrent source
+        run: |
+          cd sdk/package
+          wget https://github.com/KryptonLee/qBittorrent-openwrt-package/releases/download/qBittorrent-v4.4.5-for-openwrt-19.07/qbittorrent.tar.gz
+          tar -xzf qbittorrent.tar.gz
+          mv qbittorrent ./qbittorrent
+          rm -f qbittorrent.tar.gz
+
+      - name: Download Qt5 package (OpenWrt)
+        run: |
+          cd sdk/package
+          wget https://github.com/KryptonLee/qBittorrent-openwrt-package/releases/download/qBittorrent-v4.4.5-for-openwrt-19.07/qt5.tar.gz
+          tar -xzf qt5.tar.gz
+          mv qt5 ./qt5
+          rm -f qt5.tar.gz
 
       - name: Update feeds
         run: |
@@ -44,6 +60,16 @@ jobs:
           cd sdk
           make defconfig
 
+      - name: Build Qt5
+        run: |
+          cd sdk
+          make package/qt5/compile -j$(nproc)
+
+      - name: Build libtorrent-rasterbar
+        run: |
+          cd sdk
+          make package/libtorrent-rasterbar/compile -j$(nproc)
+
       - name: Build qBittorrent
         run: |
           cd sdk
@@ -53,4 +79,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: qbittorrent-ipk
-          path: sdk/bin/packages/*/*/qbittorrent*.ipk
+          path: sdk/bin/packages/*/*/{qbittorrent,libtorrent-rasterbar,qt5}*.ipk
