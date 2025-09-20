@@ -27,7 +27,7 @@ jobs:
         tar -Jxf openwrt-sdk-*.tar.xz
         mv openwrt-sdk-* sdk
 
-    - name: Clone qBittorrent package (for-openwrt-19.07)
+    - name: Clone qBittorrent package (for-openwrt-19.7)
       run: |
         cd sdk/package
         git clone -b for-openwrt-19.07 https://github.com/KryptonLee/qBittorrent-openwrt-package.git qbittorrent
